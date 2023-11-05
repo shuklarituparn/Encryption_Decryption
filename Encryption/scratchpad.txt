@@ -218,3 +218,102 @@ if __name__ == "__main__":
         elif choice == "5":
             print("Goodbye.")
             break
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+if __name__=="__main__":
+    text_path = "caesar_file.txt"
+    key_path = "caesar_key.txt"
+
+    text = CaesarCipher.read_text_from_file(text_path)
+    key = int(CaesarCipher.read_key_from_file(key_path))
+
+    vigenere_cipher = CaesarCipher(text)
+    encrypted_text = vigenere_cipher.encrypt(text, key)
+
+    decrypted_text = vigenere_cipher.decrypt(encrypted_text, key)
+    print("The original text is: ", text)
+    print("The key is: ", key)
+
+    print("Encrypted Text:", encrypted_text)
+    print("Decrypted Text:", decrypted_text)
+
+    # GCYCZFMLYLEIM
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# Usage example:
+text_path = "text.txt"
+key_path = "key.txt"
+
+text = VernamCipher.read_text_from_file(text_path)
+key = VernamCipher.read_key_from_file(key_path)
+
+vernam_cipher = VernamCipher(text)
+encrypted_text = vernam_cipher.vernam_encrypt(text,key)
+
+decrypted_text = vernam_cipher.vernam_decrypt(encrypted_text,key)
+
+print("Encrypted Text:", encrypted_text)
+print("Decrypted Text:", decrypted_text)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+import numpy as np
+from PIL import Image
+
+message = input("Enter the word you wanna encrypt: ")
+
+# Encode the message in a serie of 8-bit values
+b_message = ''.join(["{:08b}".format(ord(x)) for x in message])
+b_message = [int(x) for x in b_message]
+
+b_message_lenght = len(b_message)
+
+# Get the image pixel arrays
+with Image.open("img.png") as img:
+    width, height = img.size
+    data = np.array(img)
+
+# Flatten the pixel arrays
+data = np.reshape(data, -1)
+
+# Overwrite pixel LSB
+data[:b_message_lenght] = (data[:b_message_lenght] & ~1) | b_message
+
+# Reshape back to an image pixel array
+data = np.reshape(data, (height, width, 3))
+
+new_img = Image.fromarray(data)
+new_img.save("cover-secret.png")
+new_img.show()
+
+with Image.open("cover-secret.png") as img:
+    width, height = img.size
+    data = np.array(img)
+
+data = np.reshape(data, width * height * 3)
+# extract lsb
+data = data & 1
+# Packs binary-valued array into 8-bits array.
+data = np.packbits(data)
+# Read and convert integer to Unicode characters until hitting a non-printable character
+# Read and convert integers to Unicode characters until reaching the end of the message
+decoded_message = ""
+for x in data:
+    l = chr(x)
+    if l == '\0':
+        break
+    decoded_message += l
+
+print(decoded_message)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+if __name__ == "__main__":
+    image_steganography = ImageSteganography("img.png")
+
+    message = input("Enter the word you want to encrypt: ")
+    image_steganography.encode_message(message, "cover-secret.png")
+
+    decoded_message = image_steganography.decode_message("cover-secret.png")
+    print("Decoded Message:", decoded_message)
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

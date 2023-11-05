@@ -75,17 +75,3 @@ class VernamCipher:
         return result
 
 
-# Usage example:
-text_path = "text.txt"
-key_path = "key.txt"
-
-text = VernamCipher.read_text_from_file(text_path)
-key = VernamCipher.read_key_from_file(key_path)
-
-vernam_cipher = VernamCipher(text)
-encrypted_text = vernam_cipher.vernam_encrypt(text,key)
-
-decrypted_text = vernam_cipher.vernam_decrypt(encrypted_text,key)
-
-print("Encrypted Text:", encrypted_text)
-print("Decrypted Text:", decrypted_text)

@@ -1,58 +1,55 @@
 import numpy as np
 from PIL import Image
 
-message = input("Enter the word you wanna encrypt: ")
+class ImageSteganography:
 
-# Encode the message in a serie of 8-bit values
-b_message = ''.join(["{:08b}".format(ord(x)) for x in message])
-b_message = [int(x) for x in b_message]
+    def __init__(self, image_path):
+        self.image_path = image_path
+        self.end_marker = "<END>"
 
-b_message_lenght = len(b_message)
+    def encode_message(self, message, output_path):
+        message += self.end_marker
 
-# Get the image pixel arrays
-with Image.open("img.png") as img:
-    width, height = img.size
-    data = np.array(img)
+        b_message = ''.join(["{:08b}".format(ord(x)) for x in message])
+        b_message = [int(x) for x in b_message]
+        b_message_length = len(b_message)
 
-# Flatten the pixel arrays
-data = np.reshape(data, -1)
+        with Image.open(self.image_path) as img:
+            width, height = img.size
+            data = np.array(img)
 
-# Overwrite pixel LSB
-data[:b_message_lenght] = (data[:b_message_lenght] & ~1) | b_message
+        data = np.reshape(data, -1)
+        data[:b_message_length] = (data[:b_message_length] & ~1) | b_message
+        data = np.reshape(data, (height, width, 3))
 
-# Reshape back to an image pixel array
-data = np.reshape(data, (height, width, 3))
+        new_img = Image.fromarray(data)
+        new_img.save(output_path)
+        new_img.show()
 
-new_img = Image.fromarray(data)
-new_img.save("cover-secret.png")
-new_img.show()
+    def decode_message(self, secret_image_path):
+        with Image.open(secret_image_path) as img:
+            width, height = img.size
+            data = np.array(img)
 
-with Image.open("cover-secret.png") as img:
-    width, height = img.size
-    data = np.array(img)
+        data = np.reshape(data, width * height * 3)
+        data = data & 1
+        data = np.packbits(data)
 
-data = np.reshape(data, width * height * 3)
-# extract lsb
-data = data & 1
-# Packs binary-valued array into 8-bits array.
-data = np.packbits(data)
-# Read and convert integer to Unicode characters until hitting a non-printable character
-# Read and convert integers to Unicode characters until reaching the end of the message
-decoded_message = ""
-for x in data:
-    l = chr(x)
-    if l == '\0':
-        break
-    decoded_message += l
+        decoded_message = ""
+        end_marker_index = 0
 
-print(decoded_message)
+        for x in data:
+            l = chr(x)
+            decoded_message += l
+
+            # Check for the end marker
+            if l == self.end_marker[end_marker_index]:
+                end_marker_index += 1
+                if end_marker_index == len(self.end_marker):
+                    break
+            else:
+                end_marker_index = 0
+
+        return decoded_message[:-len(self.end_marker)]
 
 
-
-
-'''
-/usr/bin/python3.10 /home/rituparn/Documents/Dev/languages/Proj1/Encryption/steganography.py 
-Enter the word you wanna encrypt: m
-mm¶Ûm¶ÿÿÿÿÿÿÿÿÿÿÿÿ¶ÛmI$
-Process finished with exit code 0
-'''

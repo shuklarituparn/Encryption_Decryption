@@ -60,8 +60,6 @@ class VigenereCipher:
             return ("".join(key))
 
         key_repeated1 = list(generateKey(user_input, key_string))
-        # no problem in the key
-        # no problem in the original text either
 
 
         result = ""
