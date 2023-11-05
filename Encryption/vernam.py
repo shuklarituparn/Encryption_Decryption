@@ -12,7 +12,7 @@ class VernamCipher:
         with open(key_path, 'r') as file:
             return file.read()
 
-    def vernam_encrypt(self, user_input: str, key_string: str) -> str:
+    def encrypt(self, user_input: str, key_string: str) -> str:
         result = ""
         for i in range(len(user_input)):
             char = user_input[i]
@@ -43,7 +43,7 @@ class VernamCipher:
 
         return result
 
-    def vernam_decrypt(self, encrypted_key: str, key_string: str) -> str:
+    def decrypt(self, encrypted_key: str, key_string: str) -> str:
         result = ""
         for i in range(len(encrypted_key)):
             char = encrypted_key[i]

@@ -12,7 +12,7 @@ class VigenereCipher:
         with open(key_path, 'r') as file:
             return file.read()
 
-    def vigenere_encrypt(self, user_input, key_string) -> str:
+    def encrypt(self, user_input, key_string) -> str:
         def generateKey(string, key):
             key = list(key)
             if len(string) == len(key):
@@ -48,7 +48,7 @@ class VigenereCipher:
 
         return result
 
-    def vigenere_decrypt(self, user_input, key_string) -> str:
+    def decrypt(self, user_input, key_string) -> str:
         def generateKey(string, key):
             key = list(key)
             if len(string) == len(key):

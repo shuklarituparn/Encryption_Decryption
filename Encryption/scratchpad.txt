@@ -317,3 +317,67 @@ if __name__ == "__main__":
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ def create_gui_elements(self):
+        # Label to choose the cipher
+        cipher_label = tk.Label(self, text="Select Cipher:")
+        cipher_label.pack()
+
+        # Radio buttons to choose the cipher
+        caesar_radio = tk.Radiobutton(self, text="Caesar Cipher", variable=self.selected_cipher, value="caesar")
+        caesar_radio.pack()
+        vigenere_radio = tk.Radiobutton(self, text="Vigenere Cipher", variable=self.selected_cipher, value="vigenere")
+        vigenere_radio.pack()
+        vernam_radio = tk.Radiobutton(self, text="Vernam Cipher", variable=self.selected_cipher, value="vernam")
+        vernam_radio.pack()
+
+        # Input field for text file path
+        text_file_label = tk.Label(self, text="Text File Path:")
+        text_file_label.pack()
+        self.text_file_entry = tk.Entry(self)
+        self.text_file_entry.pack()
+
+        # Input field for key file path
+        key_file_label = tk.Label(self, text="Key File Path:")
+        key_file_label.pack()
+        self.key_file_entry = tk.Entry(self)
+        self.key_file_entry.pack()
+
+        #
+        encrypt_button = tk.Button(self, text="Encrypt", command=self.encrypt)
+        encrypt_button.pack()
+        result_label = tk.Label(self, text="Encrypted Text:")
+        result_label.pack()
+        self.result_text = tk.Text(self, height=10, width=40)
+        self.result_text.pack()
+
+    def encrypt(self):
+        cipher_type = self.selected_cipher.get()
+        text_file_path = self.text_file_entry.get()
+        key_file_path = self.key_file_entry.get()
+
+        if cipher_type == "caesar":
+            cipher = caesar.CaesarCipher
+        elif cipher_type == "vigenere":
+            cipher = vigenere.VigenereCipher
+        elif cipher_type == "vernam":
+            cipher = vernam.VernamCipher
+        else:
+            # Handle invalid selection
+            return
+
+        with open(text_file_path, 'r') as text_file, open(key_file_path, 'r') as key_file:
+            text = text_file.read()
+            key = key_file.read()
+
+
+        encrypted_text = cipher.encrypt(text, key)
+        self.result_text.delete('1.0', tk.END)  # Clear the result text
+        self.result_text.insert(tk.END, encrypted_text)
+
+        # You can display or save the encrypted text as needed
+
+if __name__ == "__main__":
+    app = EncryptionApp()
+    app.mainloop()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

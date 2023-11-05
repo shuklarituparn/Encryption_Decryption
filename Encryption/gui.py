@@ -1,22 +1,16 @@
-import customtkinter as ctk
+import tkinter as tk
+from tkinter import filedialog
 import caesar
+import vigenere
 import vernam
-import vignere
 import steganography
 
-ctk.set_appearance_mode("dark")
-ctk.set_default_color_theme("blue")
-
-app=ctk.CTk()
-app.geometry("800x800")
-app.title("Encryption Software")
-
-app.mainloop()
-
-
-
-
-
-
+class EncryptionApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Encryption Program")
+        self.geometry("800x800")
+        self.selected_cipher = tk.StringVar()
+        self.create_gui_elements()
 
 

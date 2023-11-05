@@ -7,7 +7,7 @@ class ImageSteganography:
         self.image_path = image_path
         self.end_marker = "<END>"
 
-    def encode_message(self, message, output_path):
+    def encrypt(self, message, output_path):
         message += self.end_marker
 
         b_message = ''.join(["{:08b}".format(ord(x)) for x in message])
@@ -26,7 +26,7 @@ class ImageSteganography:
         new_img.save(output_path)
         new_img.show()
 
-    def decode_message(self, secret_image_path):
+    def decrypt(self, secret_image_path):
         with Image.open(secret_image_path) as img:
             width, height = img.size
             data = np.array(img)
