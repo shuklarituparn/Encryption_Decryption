@@ -381,3 +381,234 @@ if __name__ == "__main__":
     app = EncryptionApp()
     app.mainloop()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import simpledialog
+from PIL import Image
+from Encrypt import (
+    caesar_encrypt, vigenere_encrypt, vernam_encrypt,
+    caesar_decrypt, vigenere_decrypt, vernam_decrypt
+)
+import os
+
+class CipherApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Encryption/Decryption App")
+
+        self.mode_label = tk.Label(root, text="Choose Mode:")
+        self.mode_label.pack()
+
+        self.mode_var = tk.StringVar(value="cipher")
+        self.mode_menu = tk.OptionMenu(root, self.mode_var, "cipher", "steganography")
+        self.mode_menu.pack()
+
+        self.cipher_label = tk.Label(root, text="Choose Cipher:")
+        self.cipher_label.pack()
+
+        self.cipher_var = tk.StringVar(value="caesar")
+        self.cipher_menu = tk.OptionMenu(root, self.cipher_var, "caesar", "vigenere", "vernam")
+        self.cipher_menu.pack()
+
+        self.operation_var = tk.StringVar(value="encrypt")
+        self.operation_label = tk.Label(root, text="Choose Operation:")
+        self.operation_label.pack()
+        self.operation_menu = tk.OptionMenu(root, self.operation_var, "encrypt", "decrypt")
+        self.operation_menu.pack()
+
+        self.input_text_label = tk.Label(root, text="Input Text/Path:")
+        self.input_text_label.pack()
+
+        self.input_text_entry = tk.Entry(root)
+        self.input_text_entry.pack()
+
+        self.key_label = tk.Label(root, text="Key/Output Name:")
+        self.key_label.pack()
+
+        self.key_entry = tk.Entry(root)
+        self.key_entry.pack()
+
+        self.submit_button = tk.Button(root, text="Submit", command=self.handle_submit)
+        self.submit_button.pack()
+
+    def handle_submit(self):
+        mode = self.mode_var.get()
+        operation = self.operation_var.get()
+
+        if mode == "steganography":
+            self.steganography_action(operation)
+        else:
+            cipher = self.cipher_var.get()
+            self.cipher_action(cipher, operation)
+
+    def steganography_action(self, operation):
+        if operation == "encrypt":
+            self.steganography_encrypt()
+        else:
+            self.steganography_decrypt()
+
+    def steganography_encrypt(self):
+        input_text = self.input_text_entry.get()
+        if not input_text:
+            messagebox.showerror("Error", "Please provide input text.")
+            return
+
+        image_path = simpledialog.askstring("Input", "Enter the path to the image:")
+        if not image_path:
+            messagebox.showerror("Error", "Please provide the image path.")
+            return
+
+        new_image_name = simpledialog.askstring("Input", "Enter the name of the output image (with extension):")
+        if not new_image_name:
+            messagebox.showerror("Error", "Please provide the output image name.")
+            return
+
+        try:
+            self.encode_text_in_image(image_path, input_text, new_image_name)
+            messagebox.showinfo("Steganography Encryption Result", "Image steganography encryption complete.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred during steganography encryption: {e}")
+
+    def steganography_decrypt(self):
+        image_path = self.input_text_entry.get()
+        if not image_path:
+            messagebox.showerror("Error", "Please provide the image path.")
+            return
+
+        try:
+            decoded_text = self.decode_text_from_image(image_path)
+            messagebox.showinfo("Steganography Decryption Result", f"Decoded Text: {decoded_text}")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred during steganography decryption: {e}")
+
+    def encode_text_in_image(self, image_path, data, new_image_name):
+        image = Image.open(image_path, 'r')
+        new_image = image.copy()
+        self.encode_data(new_image, data)
+        new_image.save(new_image_name, "PNG")
+
+    def decode_text_from_image(self, image_path):
+        image = Image.open(image_path, 'r')
+        return self.decode_data(image)
+
+    def encode_data(self, new_image, data):
+        width, height = new_image.size
+        data_len = len(data)
+        x, y = 0, 0
+
+        for pixel in self.modify_pixels(new_image.getdata(), data):
+            new_image.putpixel((x, y), pixel)
+            if x == width - 1:
+                x = 0
+                y += 1
+            else:
+                x += 1
+
+    def decode_data(self, image):
+        data = ''
+        iter_pixels = iter(image.getdata())
+
+        while True:
+            pixels = [value for value in iter_pixels.__next__()[:3] +
+                      iter_pixels.__next__()[:3] +
+                      iter_pixels.__next__()[:3]]
+            bin_str = ''
+
+            for i in pixels[:8]:
+                if i % 2 == 0:
+                    bin_str += '0'
+                else:
+                    bin_str += '1'
+
+            data += chr(int(bin_str, 2))
+            if pixels[-1] % 2 != 0:
+                return data
+
+    def modify_pixels(self, pix, data):
+        datalist = self.generate_data(data)
+        lendata = len(datalist)
+        imdata = iter(pix)
+
+        for i in range(lendata):
+            pixel = [value for value in imdata.__next__()[:3] +
+                      imdata.__next__()[:3] +
+                      imdata.__next__()[:3]]
+
+            for j in range(8):
+                if datalist[i][j] == '0' and pixel[j] % 2 != 0:
+                    pixel[j] -= 1
+                elif datalist[i][j] == '1' and pixel[j] % 2 == 0:
+                    if pixel[j] != 0:
+                        pixel[j] -= 1
+                    else:
+                        pixel[j] += 1
+
+            if i == lendata - 1:
+                if pixel[-1] % 2 == 0:
+                    if pixel[-1] != 0:
+                        pixel[-1] -= 1
+                    else:
+                        pixel[-1] += 1
+            else:
+                if pixel[-1] % 2 != 0:
+                    pixel[-1] -= 1
+
+            pixel = tuple(pixel)
+            yield pixel[0:3]
+            yield pixel[3:6]
+            yield pixel[6:9]
+
+    def generate_data(self, data):
+        new_data = [format(ord(char), '08b') for char in data]
+        return new_data
+
+    def cipher_action(self, cipher, operation):
+        input_text = self.input_text_entry.get()
+        key = self.key_entry.get()
+
+        if not input_text:
+            messagebox.showerror("Error", "Please provide input text.")
+            return
+
+        try:
+            if operation == "encrypt":
+                result = self.encrypt_text(cipher, input_text, key)
+            else:
+                result = self.decrypt_text(cipher, input_text, key)
+
+            if result is not None:
+                messagebox.showinfo(f"{cipher.capitalize()} {operation.capitalize()} Result", result)
+            else:
+                messagebox.showerror("Error", "Decryption function not implemented for this mode.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {e}")
+
+    def encrypt_text(self, cipher, input_text, key):
+        if cipher == "caesar":
+            return caesar_encrypt(input_text, int(key))
+        elif cipher == "vigenere":
+            return vigenere_encrypt(input_text, key)
+        elif cipher == "vernam":
+            return vernam_encrypt(input_text, key)
+        else:
+            return None  # Implement encryption function for other ciphers
+
+    def decrypt_text(self, cipher, input_text, key):
+        if cipher == "caesar":
+            return caesar_decrypt(input_text, int(key))
+        elif cipher == "vigenere":
+            return vigenere_decrypt(input_text, key)
+        elif cipher == "vernam":
+            return vernam_decrypt(input_text, key)
+        else:
+            return None  # Implement decryption function for other ciphers
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = CipherApp(root)
+    root.mainloop()
+
+
