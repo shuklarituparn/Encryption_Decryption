@@ -8,18 +8,8 @@ class CaesarCipher:
     def __init__(self, text):
         self.text = text
 
-    @staticmethod
-    def read_text_from_file(file_path):
-        with open(file_path, 'r') as file:
-            return file.read()
-
-    @staticmethod
-    def read_key_from_file(key_path):
-        with open(key_path, 'r') as file:
-            return file.read()
-
-    def encrypt(self, input_string: str, key: int, alphabet: str | None = None) -> str:
-        alpha = alphabet or ascii_letters
+    def encrypt( self,input_string: str, key: int) -> str:
+        alpha = ascii_letters
 
         result = ""
 
@@ -33,12 +23,12 @@ class CaesarCipher:
 
         return result
 
-    def decrypt(self,input_string: str, key: int, alphabet: str | None = None) -> str:
+    def decrypt(self,input_string: str, key: int) -> str:
         # Turn on decode mode by making the key negative
 
         result=""
         key *= -1
-        alpha = alphabet or ascii_letters
+        alpha = ascii_letters
 
         result = ""
 

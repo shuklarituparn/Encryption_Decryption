@@ -2,16 +2,6 @@ class VigenereCipher:
     def __init__(self, text):
         self.text = text
 
-    @staticmethod
-    def read_text_from_file(file_path):
-        with open(file_path, 'r') as file:
-            return file.read()
-
-    @staticmethod
-    def read_key_from_file(key_path):
-        with open(key_path, 'r') as file:
-            return file.read()
-
     def encrypt(self, user_input, key_string) -> str:
         def generateKey(string, key):
             key = list(key)

@@ -1,16 +1,6 @@
 class VernamCipher:
     def __init__(self, text):
-        self.text = text  # this is the original text or the
-
-    @staticmethod
-    def read_text_from_file(file_path):
-        with open(file_path, 'r') as file:
-            return file.read()
-
-    @staticmethod
-    def read_key_from_file(key_path):
-        with open(key_path, 'r') as file:
-            return file.read()
+        self.text = text  # this is the original text or the text we want to save
 
     def encrypt(self, user_input: str, key_string: str) -> str:
         result = ""
