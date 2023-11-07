@@ -1,0 +1,5 @@
+numpy~=1.25.2
+opencv-python~=4.8.1.78
+Tk interface
+customTkinter
+Pillow~=10.0.0
