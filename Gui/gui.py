@@ -12,7 +12,7 @@ class EncryptionApp:
         ctk.set_default_color_theme("blue")
 
         self.root = ctk.CTk()
-        self.root.geometry("800x800")
+        self.root.geometry("400x400")
         self.root.title("The Encryption/Decryption program")
 
         self.label_top = ctk.CTkLabel(self.root, font=("Arial", 34), text="Choose your Mode")

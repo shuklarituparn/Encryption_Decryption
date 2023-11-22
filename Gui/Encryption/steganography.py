@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 
+
 class ImageSteganography:
 
     def __init__(self, image_path):
@@ -24,7 +25,6 @@ class ImageSteganography:
 
         new_img = Image.fromarray(data)
         new_img.save(output_path)
-        new_img.show()
 
     def decrypt(self, secret_image_path):
         with Image.open(secret_image_path) as img:
@@ -51,5 +51,3 @@ class ImageSteganography:
                 end_marker_index = 0
 
         return decoded_message[:-len(self.end_marker)]
-
-

@@ -1,16 +1,17 @@
 import customtkinter as ctk
 from Encryption import caesar, vigenere, vernam
-import os
+from tkinter import filedialog as fd
 
 
 class Decryption_GUI(ctk.CTkToplevel):
     '''The Decryption GUI that decoded the text encoded when passed the file and the key path'''
+
     def __init__(self):
         ctk.set_appearance_mode("System")
         ctk.set_default_color_theme("blue")
 
         self.root = ctk.CTk()
-        self.root.geometry("800x800")
+        self.root.geometry("1000x1000")
         self.root.title("The Decryption GUI")
         self.label_top = ctk.CTkLabel(self.root, font=("Arial", 34), text="Welcome to the Decryption Gui",
                                       anchor="center")
@@ -36,20 +37,25 @@ class Decryption_GUI(ctk.CTkToplevel):
                                             anchor="center")
         self.label_file_path.pack(pady=20)
 
-        self.file_path = ctk.StringVar()
-        self.file_path_button = ctk.CTkEntry(self.root, placeholder_text="File_Path",
-                                             textvariable=self.file_path)
+        self.file_path_button = ctk.CTkButton(self.root, text="Choose the Encrypted path",
+                                              command=self.get_file_path)
         self.file_path_button.pack(padx=10, pady=20)
+
+        self.label_file_path_chosen = ctk.CTkLabel(self.root, font=("Arial", 10), text="",
+                                                   anchor="center")
+        self.label_file_path_chosen.pack(pady=10)
 
         self.label_key_path = ctk.CTkLabel(self.root, font=("Arial", 20), text="Enter the file path of the key",
                                            anchor="center")
         self.label_key_path.pack(pady=20)
 
-        self.key_path = ctk.StringVar()
+        self.key_path_button = ctk.CTkButton(self.root, text="Choose the key for Decryption",
+                                             command=self.get_key_path)
+        self.key_path_button.pack(padx=10, pady=20)
 
-        self.Key_path_button = ctk.CTkEntry(self.root, placeholder_text="File_Path",
-                                            textvariable=self.key_path)
-        self.Key_path_button.pack(padx=10, pady=20)
+        self.label_key_path_chosen = ctk.CTkLabel(self.root, font=("Arial", 10), text="",
+                                                  anchor="center")
+        self.label_key_path_chosen.pack(pady=10)
 
         self.start_button = ctk.CTkButton(self.root, text="Start the decryption", command=self.start_decryption)
         self.start_button.pack(padx=10, pady=20)
@@ -61,27 +67,30 @@ class Decryption_GUI(ctk.CTkToplevel):
         self.output_label = ctk.CTkTextbox(self.root)
         self.output_label.pack(pady=10)
 
+        self.filepath = None
+        self.keypath = None
+
+    def get_file_path(self):
+        self.filepath = fd.askopenfilename()
+        self.label_file_path_chosen.configure(text=self.filepath)
+
+        # The function is working
+
+    def get_key_path(self):
+        self.keypath= fd.askopenfilename()
+        self.label_key_path_chosen.configure(text=self.keypath)
+        # The function is working
+
     def start_decryption(self):
 
-        encryption_folder_path = os.path.join('..', 'Encryption')
-        file_path = self.file_path_button.get()
-        key_path = self.Key_path_button.get()
-        file_path = os.path.join(encryption_folder_path, file_path)
-        key_path = os.path.join(encryption_folder_path, key_path)
         file_to_decrypt = ''
         key_to_decrypt = ''
-        encrypted_result = ''
-        # Check if the directory and files exist
-        if os.path.exists(encryption_folder_path):
-            with open(file_path, "r") as file1:
-                file_to_decrypt = file1.read()
-                # print("File Contents:", file_to_encrypt)
 
-            with open(key_path, "r") as key1:
-                key_to_decrypt = key1.read()
-                # print("Key Contents:", key_to_encrypt)
-        else:
-            print("The specified directory does not exist:", encryption_folder_path)
+        with open(self.filepath, "r") as file1:
+            file_to_decrypt = file1.read()
+
+        with open(self.keypath, "r") as key:
+            key_to_decrypt = key.read()
 
         choice_of_decryption = self.choice_var.get()
         if choice_of_decryption == "Caeasr":
